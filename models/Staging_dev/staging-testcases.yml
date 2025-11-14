@@ -1,0 +1,46 @@
+version: 2
+
+models:
+  - name: stg_customers
+    config: 
+      schema: "{{ env_var('DBT_STGSCHEMA_NAME', 'STAGING_DEV') }}"
+    description:  "{{ doc('stg_customer_desc') }}"
+    columns:
+      - name: customerid
+        tests:
+          - unique
+          - not_null
+          - is_even
+
+  - name: stg_customers_py
+    config:
+      schema: "{{env_var('DBT_STGSCHEMA_NAME','STAGING_DEV')}}"
+           
+  - name: stg_orders
+    config:
+      schema: "{{env_var('DBT_STGSCHEMA_NAME','STAGING_DEV')}}"
+
+  - name: stg_products
+    config:
+      schema: "{{env_var('DBT_STGSCHEMA_NAME','STAGING_DEV')}}"
+
+  - name: stg_orderdetails
+    description: provides order for qwt with metric
+    columns:
+      - name: orderid
+        description: each order is defined with orderid and  line no 
+        tests:
+          - not_null
+          - relationships:
+              field: orderid
+              to: ref('stg_orders')
+
+  - name: stg_shipments
+    columns:
+      - name: status
+        description: shipment data
+        tests:
+          - accepted_values:
+              values: ['returned','replaced','shipped','ordered','cancel']
+
+               
